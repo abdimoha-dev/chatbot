@@ -27,7 +27,7 @@ def chat_view(request):
     
     if request.method == 'POST':
         user_message = request.POST.get('message', '')
-        # pdb.set_trace()
+        pdb.set_trace()
         
 
         query = user_message
@@ -59,7 +59,7 @@ def chat_view(request):
             if query in ['quit', 'q', 'exit']:
                 sys.exit()
             result = chain({"question": query, "chat_history": chat_history})
-            pdb.set_trace()
+            # pdb.set_trace()
             # print(result['answer'])
             chatbot_response = result['answer']
 

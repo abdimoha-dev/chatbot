@@ -178,7 +178,7 @@
         <form id="message-form">
           {% csrf_token %}
           <input type="text" id="message" placeholder="Type your message..." />
-          <input type="submit" onsubmit=sendMessage() value="Send" />
+          <input type="submit" onsubmit="sendMessage()" value="Send" />
         </form>
       </div>
       <img
@@ -198,7 +198,30 @@
           var message = messageInput.value.trim(); // Trim any leading/trailing spaces
 
           if (message !== "") {
-            sendMessage("user", message); // Call sendMessage with userType set to "user"
+            // Create a new message element to display user input
+            var userMessageElement = document.createElement("div");
+            userMessageElement.classList.add("message");
+            userMessageElement.classList.add("user-message");
+
+            var userProfilePic = document.createElement("img");
+            userProfilePic.classList.add("user-profile-pic");
+            userProfilePic.src = "user_profile_picture_url"; // Replace with actual profile picture URL
+            userMessageElement.appendChild(userProfilePic);
+
+            var messageBody = document.createElement("div");
+            messageBody.classList.add("message-body");
+            messageBody.innerText = message;
+            userMessageElement.appendChild(messageBody);
+
+            // Append the user message element to the chat window
+            var chat = document.getElementById("chat");
+            chat.appendChild(userMessageElement);
+
+            // Clear the message input field
+            messageInput.value = "";
+
+            // Send the message to the server (existing logic)
+            sendMessage("user", message);
           }
         });
       function sendMessage(userType, message) {
