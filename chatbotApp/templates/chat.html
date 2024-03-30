@@ -1,0 +1,256 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ChatBot</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+
+      header {
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px;
+        text-align: center;
+      }
+
+      .container {
+        display: flex;
+        max-width: 1000px;
+        margin: 20px auto;
+      }
+
+      .sidebar {
+        width: 200px;
+        background-color: #f0f0f0;
+        padding: 10px;
+      }
+
+      .sidebar h3 {
+        margin-top: 0;
+      }
+
+      .options {
+        list-style: none;
+        padding: 0;
+      }
+
+      .options li {
+        margin-bottom: 10px;
+      }
+
+      .chat-container {
+        flex: 1;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-left: 20px;
+      }
+
+      .header {
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px;
+      }
+
+      .chat {
+        padding: 20px;
+        height: 400px;
+        overflow-y: auto;
+      }
+
+      .message {
+        margin-bottom: 20px;
+        display: flex;
+        align-items: flex-start;
+      }
+
+      .user-profile-pic {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+      }
+
+      .bot-profile-pic {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+
+      .message-body {
+        background-color: #f0f0f0;
+        border-radius: 5px;
+        padding: 10px;
+        max-width: 70%;
+      }
+
+      .bot-message .message-body {
+        background-color: #e0e0e0;
+      }
+
+      input[type="text"] {
+        width: calc(100% - 80px);
+        padding: 8px;
+        margin: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      input[type="submit"] {
+        width: 70px;
+        padding: 8px;
+        margin: 5px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+      }
+
+      .profile-dropdown {
+        position: relative;
+        display: inline-block;
+      }
+
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 120px;
+        z-index: 1;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .dropdown-content a {
+        color: #333;
+        padding: 10px;
+        display: block;
+        text-decoration: none;
+      }
+
+      .dropdown-content a:hover {
+        background-color: #ddd;
+      }
+
+      .profile-dropdown:hover .dropdown-content {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="profile-dropdown">
+        <img
+          src="user_profile_picture_url"
+          alt="Profile Picture"
+          class="user-profile-pic"
+        />
+        <div class="dropdown-content">
+          <a href="#">Settings</a>
+          <a href="#">Logout</a>
+        </div>
+      </div>
+    </header>
+    <div class="container">
+      <div class="sidebar">
+        <h3>Sidebar</h3>
+        <ul class="options">
+          <li><a href="#">Option 1</a></li>
+          <li><a href="#">Option 2</a></li>
+          <li><a href="#">Option 3</a></li>
+        </ul>
+      </div>
+      <div class="chat-container">
+        <div class="header">
+          <h2>Chat with ChatBot</h2>
+        </div>
+        <div class="chat" id="chat">
+          <!-- Messages will be displayed here -->
+        </div>
+        <form id="message-form">
+          {% csrf_token %}
+          <input type="text" id="message" placeholder="Type your message..." />
+          <input type="submit" onsubmit=sendMessage() value="Send" />
+        </form>
+      </div>
+      <img
+        src="bot_profile_picture_url"
+        alt="Profile Picture"
+        class="bot-profile-pic"
+      />
+    </div>
+
+    <script>
+      document
+        .getElementById("message-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Prevent form submission
+
+          var messageInput = document.getElementById("message");
+          var message = messageInput.value.trim(); // Trim any leading/trailing spaces
+
+          if (message !== "") {
+            sendMessage("user", message); // Call sendMessage with userType set to "user"
+          }
+        });
+      function sendMessage(userType, message) {
+        console.log("User Input:", message);
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/api/chatbot/", true);
+        xhr.setRequestHeader(
+          "Content-Type",
+          "application/x-www-form-urlencoded"
+        );
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              var response = JSON.parse(xhr.responseText);
+              displayMessage(userType, response.response);
+            } else {
+              console.error("Error sending message:", xhr.statusText);
+              // Handle errors appropriately (e.g., display error message to user)
+            }
+          }
+        };
+        xhr.send("message=" + encodeURIComponent(message));
+      }
+
+      function displayMessage(userType, message) {
+        var chat = document.getElementById("chat");
+
+        var messageElement = document.createElement("div");
+        messageElement.classList.add("message");
+
+        if (userType === "user") {
+          messageElement.classList.add("user-message");
+          var userProfilePic = document.createElement("img");
+          userProfilePic.classList.add("user-profile-pic");
+          userProfilePic.src = "user_profile_picture_url"; // Replace with actual profile picture URL
+          messageElement.appendChild(userProfilePic);
+        } else {
+          messageElement.classList.add("bot-message");
+          var botProfilePic = document.createElement("img");
+          botProfilePic.classList.add("bot-profile-pic");
+          botProfilePic.src = "bot_profile_picture_url"; // Replace with actual profile picture URL
+          messageElement.appendChild(botProfilePic);
+        }
+
+        var messageBody = document.createElement("div");
+        messageBody.classList.add("message-body");
+        messageBody.innerText = message;
+        messageElement.appendChild(messageBody);
+
+        chat.appendChild(messageElement);
+        chat.scrollTop = chat.scrollHeight; // Scroll to bottom after adding new message
+      }
+    </script>
+  </body>
+</html>
