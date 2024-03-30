@@ -5,6 +5,12 @@ from django.shortcuts import render
 from django.http import HttpResponse,JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
+from django.contrib.auth import login, authenticate, logout
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
+
 
 import openai
 from langchain.chains import ConversationalRetrievalChain, RetrievalQA
@@ -21,14 +27,13 @@ from  .constants import OPENAI_API_KEY
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
 @csrf_exempt
+@login_required(login_url='login')
 def chat_view(request):
     PERSIST = False
     import pdb
     
     if request.method == 'POST':
         user_message = request.POST.get('message', '')
-        pdb.set_trace()
-        
 
         query = user_message
         # if len(sys.argv) > 1:
@@ -71,3 +76,44 @@ def chat_view(request):
     # Return dates
 
     return render(request, 'chat.html')
+
+def user_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        # import pdb
+        # pdb.set_trace()
+        if user is not None:
+            login(request, user)
+            messages.success(request, 'logged in successfully')
+            return redirect('chatbot')
+        else:
+            messages.success(request, 'Incorect username/password')
+            return redirect('login')
+
+    else:  # Get method ->
+        # check if test user exists
+        User = get_user_model()
+        if User.objects.filter(username='test').exists():
+            return render(request, 'login.html')
+        # if test user does not exist, create user
+        else:
+            user = User.objects.create_user(
+                first_name='test',
+                last_name='user',
+                username='test',
+                password='test',
+                email='test@covid.com',
+                is_staff=True,
+                is_admin=True,
+            )
+            user.save()
+            return render(request, 'login.html')
+
+
+@login_required(login_url='login')
+def user_logout(request):
+    logout(request)
+    messages.success(request, 'logged out successfully!')
+    return redirect('login')

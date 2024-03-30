@@ -149,13 +149,13 @@
     <header>
       <div class="profile-dropdown">
         <img
-          src="user_profile_picture_url"
+          src="{% static 'img/user.png' %}"
           alt="Profile Picture"
           class="user-profile-pic"
         />
         <div class="dropdown-content">
           <a href="#">Settings</a>
-          <a href="#">Logout</a>
+          <a href="{% url 'logout' %}">Logout</a>
         </div>
       </div>
     </header>
@@ -170,7 +170,7 @@
       </div>
       <div class="chat-container">
         <div class="header">
-          <h2>Chat with ChatBot</h2>
+          <h2>Please ask Any question</h2>
         </div>
         <div class="chat" id="chat">
           <!-- Messages will be displayed here -->
@@ -181,11 +181,6 @@
           <input type="submit" onsubmit="sendMessage()" value="Send" />
         </form>
       </div>
-      <img
-        src="bot_profile_picture_url"
-        alt="Profile Picture"
-        class="bot-profile-pic"
-      />
     </div>
 
     <script>
@@ -205,7 +200,7 @@
 
             var userProfilePic = document.createElement("img");
             userProfilePic.classList.add("user-profile-pic");
-            userProfilePic.src = "user_profile_picture_url"; // Replace with actual profile picture URL
+            userProfilePic.src = "{% static 'img/user.png' %}"; // Replace with actual profile picture URL            
             userMessageElement.appendChild(userProfilePic);
 
             var messageBody = document.createElement("div");
@@ -256,13 +251,13 @@
           messageElement.classList.add("user-message");
           var userProfilePic = document.createElement("img");
           userProfilePic.classList.add("user-profile-pic");
-          userProfilePic.src = "user_profile_picture_url"; // Replace with actual profile picture URL
+          userProfilePic.src = "{% static 'img/user.png' %}"; // Replace with actual profile picture URL
           messageElement.appendChild(userProfilePic);
         } else {
           messageElement.classList.add("bot-message");
           var botProfilePic = document.createElement("img");
           botProfilePic.classList.add("bot-profile-pic");
-          botProfilePic.src = "bot_profile_picture_url"; // Replace with actual profile picture URL
+          botProfilePic.src = "{% static 'img/chat.png' %}"; // Replace with actual profile picture URL
           messageElement.appendChild(botProfilePic);
         }
 

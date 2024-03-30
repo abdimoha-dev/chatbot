@@ -1,6 +1,8 @@
 from django.urls import path
-from .views import chat_view
+from . import views
 
 urlpatterns = [
-    path('chatbot/', chat_view, name='chatbot'),
+    path('chatbot/', views.chat_view, name='chatbot'),
+    path('login/', views.user_login, name='login'),
+    path('logout', views.user_logout, name='logout'),
 ]

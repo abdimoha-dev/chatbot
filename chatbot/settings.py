@@ -33,7 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'rest_framework',
     'chatbotApp',
-    'django.contrib.admin',
+    # m'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -70,7 +70,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'chatbot.wsgi.application'
-
+AUTH_USER_MODEL = 'chatbotApp.User'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
