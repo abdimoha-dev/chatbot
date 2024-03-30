@@ -27,6 +27,37 @@
         max-width: 1000px;
         margin: 20px auto;
       }
+      .upload-container {
+        max-width: 800px;
+        margin: 20px auto;
+        background-color: #fff;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      .upload-form {
+        display: flex;
+        align-items: center;
+      }
+
+      .upload-input {
+        flex: 1;
+        margin-right: 10px;
+      }
+
+      .upload-button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .upload-button:hover {
+        background-color: #0056b3;
+      }
 
       .sidebar {
         width: 250px;
@@ -195,106 +226,26 @@
         </ul>
       </div>
       <div class="chat-container">
-        <div class="header">
-          <h2>Please ask Any question</h2>
+        <div class="upload-container">
+          <h2>Upload a Document</h2>
+          <form
+            class="upload-form"
+            enctype="multipart/form-data"
+            action="/api/upload"
+            method="POST"
+          >
+            {% csrf_token %}
+            <input
+              class="upload-input"
+              type="file"
+              name="document"
+              accept=".pdf,.doc,.docx"
+              required
+            />
+            <button class="upload-button" type="submit">Upload</button>
+          </form>
         </div>
-        <div class="chat" id="chat">
-          <!-- Messages will be displayed here -->
-        </div>
-        <form id="message-form">
-          {% csrf_token %}
-          <input type="text" id="message" placeholder="Type your message..." />
-          <input type="submit" onsubmit="sendMessage()" value="Send" />
-        </form>
       </div>
     </div>
-
-    <script>
-      document
-        .getElementById("message-form")
-        .addEventListener("submit", function (event) {
-          event.preventDefault(); // Prevent form submission
-
-          var messageInput = document.getElementById("message");
-          var message = messageInput.value.trim(); // Trim any leading/trailing spaces
-
-          if (message !== "") {
-            // Create a new message element to display user input
-            var userMessageElement = document.createElement("div");
-            userMessageElement.classList.add("message");
-            userMessageElement.classList.add("user-message");
-
-            var userProfilePic = document.createElement("img");
-            userProfilePic.classList.add("user-profile-pic");
-            userProfilePic.src = "{% static 'img/user.png' %}"; // Replace with actual profile picture URL
-            userMessageElement.appendChild(userProfilePic);
-
-            var messageBody = document.createElement("div");
-            messageBody.classList.add("message-body");
-            messageBody.innerText = message;
-            userMessageElement.appendChild(messageBody);
-
-            // Append the user message element to the chat window
-            var chat = document.getElementById("chat");
-            chat.appendChild(userMessageElement);
-
-            // Clear the message input field
-            messageInput.value = "";
-
-            // Send the message to the server (existing logic)
-            sendMessage("user", message);
-          }
-        });
-      function sendMessage(userType, message) {
-        console.log("User Input:", message);
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/api/chatbot/", true);
-        xhr.setRequestHeader(
-          "Content-Type",
-          "application/x-www-form-urlencoded"
-        );
-        xhr.onreadystatechange = function () {
-          if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-              var response = JSON.parse(xhr.responseText);
-              displayMessage(userType, response.response);
-            } else {
-              console.error("Error sending message:", xhr.statusText);
-              // Handle errors appropriately (e.g., display error message to user)
-            }
-          }
-        };
-        xhr.send("message=" + encodeURIComponent(message));
-      }
-
-      function displayMessage(userType, message) {
-        var chat = document.getElementById("chat");
-
-        var messageElement = document.createElement("div");
-        messageElement.classList.add("message");
-
-        if (userType === "user") {
-          messageElement.classList.add("user-message");
-          var userProfilePic = document.createElement("img");
-          userProfilePic.classList.add("user-profile-pic");
-          userProfilePic.src = "{% static 'img/user.png' %}"; // Replace with actual profile picture URL
-          messageElement.appendChild(userProfilePic);
-        } else {
-          messageElement.classList.add("bot-message");
-          var botProfilePic = document.createElement("img");
-          botProfilePic.classList.add("bot-profile-pic");
-          botProfilePic.src = "{% static 'img/chat.png' %}"; // Replace with actual profile picture URL
-          messageElement.appendChild(botProfilePic);
-        }
-
-        var messageBody = document.createElement("div");
-        messageBody.classList.add("message-body");
-        messageBody.innerText = message;
-        messageElement.appendChild(messageBody);
-
-        chat.appendChild(messageElement);
-        chat.scrollTop = chat.scrollHeight; // Scroll to bottom after adding new message
-      }
-    </script>
   </body>
 </html>

@@ -117,3 +117,24 @@ def user_logout(request):
     logout(request)
     messages.success(request, 'logged out successfully!')
     return redirect('login')
+
+@login_required(login_url='login')
+def upload_file(request):
+    if request.method == 'POST' and request.FILES['document']:
+        document = request.FILES['document']
+        # Define the directory where you want to save the uploaded file
+        upload_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+        # Create the directory if it doesn't exist
+        if not os.path.exists(upload_dir):
+            os.makedirs(upload_dir)
+        # Construct the file path
+        file_path = os.path.join(upload_dir, document.name)
+        # Write the uploaded file to the specified location
+        with open(file_path, 'wb') as destination:
+            for chunk in document.chunks():
+                destination.write(chunk)
+        # Optionally, you can save the file path in your database
+        # For example:
+        # UploadedFile.objects.create(file_path=file_path)
+        return render(request, 'upload.html')
+    return render(request, 'upload.html')
